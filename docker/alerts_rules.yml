@@ -1,0 +1,22 @@
+groups:
+  - name: cineminha
+    rules:
+      - alert: JvmMemoryFillingUp
+        expr: (sum by (instance)(jvm_memory_used_bytes{area="heap"}) / sum by (instance)(jvm_memory_max_bytes{area="heap"})) * 100 > 70
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: JVM memory filling up (instance {{ $labels.instance }})
+          description: "JVM memory is filling up (> 70%)\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+      - alert: altaTaxaDeErrosNasRequisicoes
+        expr: rate(http_server_requests_seconds_count{status="500|400"}[10m]) > 0.7
+        for: 10m
+        labels:
+          app: cineminha
+          severity: critical
+        annotations:
+          title: Taxa de Erro alta
+          summary: A taxa de erro das requisições http está com valores além do normal.
+          description: Alta taxa de respostas http 400 e 500
